@@ -122,3 +122,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # emails
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# media files
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+
+# REST Framework
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ]
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+}
