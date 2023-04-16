@@ -1,0 +1,9 @@
+*.pyc
+*.db
+db.*
+.*
+
+/data/
+
+!.gitignore
+!.env
