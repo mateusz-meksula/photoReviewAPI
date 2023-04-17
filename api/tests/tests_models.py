@@ -49,6 +49,6 @@ class PhotoTestCase(TestCase):
             name="big_image.jpg", content=image_content, content_type="image/jpg"
         )
         photo = Photo(author=self.u, image=image, title="test", description="test")
-        
+
         with self.assertRaises(ValidationError):
             photo.full_clean()
