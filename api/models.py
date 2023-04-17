@@ -32,8 +32,10 @@ class Photo(BaseModel):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="photos", editable=False
     )
-    image = models.ImageField(upload_to=save_image, validators=[image_size_validator])
-    title = models.CharField(max_length=50)
+    image = models.ImageField(
+        upload_to=save_image, editable=False, validators=[image_size_validator]
+    )
+    title = models.CharField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
 
 
