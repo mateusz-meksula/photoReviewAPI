@@ -5,6 +5,7 @@ db.*
 
 /data/
 /media/
+/client/
 
 !.gitignore
 !.env

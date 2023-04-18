@@ -6,11 +6,20 @@ User = get_user_model()
 
 
 def save_image(instance, filename):
+    """
+    Save image file to the '/media/photos/' with `title` as file name.
+    """
+
     ext = filename.split(".")[-1]
     return f"photos/{instance.title}.{ext}"
 
 
 def image_size_validator(image):
+    """
+    Raise `ValidationError` when image size is greater than `size_limit`.
+    """
+
+    # image size limit in MB
     size_limit = 3
     if image.size > size_limit * 1024 * 1024:
         raise ValidationError(f"Maximum image size is {size_limit}")
@@ -32,13 +41,12 @@ class Photo(BaseModel):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="photos", editable=False
     )
-    image = models.ImageField(
-        upload_to=save_image, editable=False, validators=[image_size_validator]
-    )
+    image = models.ImageField(upload_to=save_image, validators=[image_size_validator])
     title = models.CharField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
 
 
+# Review Model draft
 # class Review(BaseModel):
 #     author = models.ForeignKey(
 #         User, on_delete=models.CASCADE, related_name="reviews", editable=False
