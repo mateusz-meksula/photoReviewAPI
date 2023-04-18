@@ -7,11 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 
 from ..models import Photo, Tag
-from ..serializers import (
-    PhotoCreateSerializer,
-    PhotoDetailSerializer,
-    PhotoPatchSerializer,
-)
+from ..serializers import PhotoDetailSerializer
 
 User = get_user_model()
 
@@ -119,13 +115,8 @@ class PhotoListTestCase(APITestCase):
         photos = Photo.objects.all()
         expected_data = PhotoDetailSerializer(photos, many=True).data
 
-        for inst in r.data:
-            for key, val in inst.items():
-                if key == "image":
-                    val = val.replace("http://testserver", "")
-                    inst[key] = val
-
-        self.assertEqual(r.data, expected_data)
+        data_str = str(r.data).replace("http://testserver", "")
+        self.assertEqual(data_str, str(expected_data))
 
 
 class PhotoDeleteTestCase(APITestCase):
@@ -211,12 +202,8 @@ class PhotoRetrieveTestCase(APITestCase):
         p = Photo.objects.first()
         expected_data = PhotoDetailSerializer(p).data
 
-        for key, val in r.data.items():
-            if key == "image":
-                val = val.replace("http://testserver", "")
-                r.data[key] = val
-
-        self.assertEqual(r.data, expected_data)
+        data_str = str(r.data).replace("http://testserver", "")
+        self.assertEqual(data_str, str(expected_data))
 
     def test_qs_returned_with_tags(self):
         p = Photo.objects.first()
@@ -226,13 +213,9 @@ class PhotoRetrieveTestCase(APITestCase):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         expected_data = PhotoDetailSerializer(p).data
+        data_str = str(r.data).replace("http://testserver", "")
 
-        for key, val in r.data.items():
-            if key == "image":
-                val = val.replace("http://testserver", "")
-                r.data[key] = val
-
-        self.assertEqual(r.data, expected_data)
+        self.assertEqual(data_str, str(expected_data))
 
     def test_photo_not_found(self):
         r = self.client.get("/api/photos/99/")

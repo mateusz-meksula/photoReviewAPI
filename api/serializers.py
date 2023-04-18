@@ -61,3 +61,21 @@ class PhotoPatchSerializer(serializers.ModelSerializer):
             instance.tags.add(tag)
 
         return super().update(instance, validated_data)
+
+
+class TagListSerializer(serializers.ModelSerializer):
+    photos = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name="photo-detail"
+    )
+
+    class Meta:
+        model = Tag
+        fields = ["id", "name", "photos"]
+
+
+class TagDetailSerializer(serializers.ModelSerializer):
+    photos = PhotoDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Tag
+        fields = ["id", "name", "photos"]

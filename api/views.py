@@ -1,12 +1,8 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import permissions
 
-from .models import Photo
-from .serializers import (
-    PhotoCreateSerializer,
-    PhotoDetailSerializer,
-    PhotoPatchSerializer,
-)
+from .models import Photo, Tag
+from . import serializers
 
 
 class PhotoViewSet(ModelViewSet):
@@ -38,17 +34,29 @@ class PhotoViewSet(ModelViewSet):
         """
 
         if self.action == "create":
-            return PhotoCreateSerializer
+            return serializers.PhotoCreateSerializer
         if self.action in ("list", "retrieve", "destroy"):
-            return PhotoDetailSerializer
+            return serializers.PhotoDetailSerializer
         if self.action == "partial_update":
-            return PhotoPatchSerializer
+            return serializers.PhotoPatchSerializer
 
     def perform_create(self, serializer):
         """
         Assigns authenticated user to the photo instance.
         """
         serializer.save(author=self.request.user)
+
+
+class TagViewSet(ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    # serializer_class = serializers.TagListSerializer
+    lookup_field = "name"
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return serializers.TagListSerializer
+        if self.action == "retrieve":
+            return serializers.TagDetailSerializer
 
 
 class IsAuthor(permissions.BasePermission):
