@@ -25,6 +25,11 @@ def image_size_validator(image):
         raise ValidationError(f"Maximum image size is {size_limit}")
 
 
+def tag_name_validator(name: str):
+    if not name.isalpha():
+        raise ValidationError("tag name must be an alphabetic string.")
+
+
 class BaseModel(models.Model):
     """
     Base Model class for shared fields.
@@ -37,12 +42,22 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Tag(models.Model):
+    name = models.CharField(
+        max_length=20, unique=True, db_index=True, validators=[tag_name_validator]
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Photo(BaseModel):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="photos", editable=False
     )
     image = models.ImageField(upload_to=save_image, validators=[image_size_validator])
     title = models.CharField(max_length=50, unique=True)
+    tags = models.ManyToManyField(Tag, related_name="photos")
     description = models.TextField(null=True, blank=True)
 
 

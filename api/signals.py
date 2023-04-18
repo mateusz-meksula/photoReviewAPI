@@ -22,10 +22,10 @@ def image_rename_after_patch(sender, instance, **kwargs):
 
     # perform action only on existing instances
     if instance.pk:
+        old_name = sender.objects.get(pk=instance.id).image.url
         ext = old_name.split(".")[-1]
         title = instance.title.replace(" ", "_")
         new_name = f"media/photos/{title}.{ext}"
-        old_name = sender.objects.get(pk=instance.id).image.url
 
         # perform action only when title changed
         if os.path.isfile(old_name[1:]) and new_name != old_name[-1]:
