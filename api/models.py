@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.validators import (
+    MinValueValidator,
+    MaxValueValidator,
+)
 
 User = get_user_model()
 
@@ -27,7 +31,7 @@ def image_size_validator(image):
 
 def tag_name_validator(name: str):
     if not name.isalpha():
-        raise ValidationError("tag name must be an alphabetic string.")
+        raise ValidationError("Tag name must be an alphabetic string.")
 
 
 class BaseModel(models.Model):
@@ -61,11 +65,15 @@ class Photo(BaseModel):
     description = models.TextField(null=True, blank=True)
 
 
-# Review Model draft
-# class Review(BaseModel):
-#     author = models.ForeignKey(
-#         User, on_delete=models.CASCADE, related_name="reviews", editable=False
-#     )
-#     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name="reviews")
-#     rating = models.IntegerField()
-#     body = models.TextField()
+class Review(BaseModel):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reviews", editable=False
+    )
+    photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
+    )
+    body = models.TextField(null=True, blank=True)
