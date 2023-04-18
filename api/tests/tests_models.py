@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from ..models import Photo
+from ..models import Photo, Tag
 
 User = get_user_model()
 
@@ -50,5 +50,25 @@ class PhotoTestCase(TestCase):
         )
         photo = Photo(author=self.u, image=image, title="test", description="test")
 
-        with self.assertRaises(ValidationError):
-            photo.full_clean()
+        self.assertRaises(ValidationError, photo.full_clean)
+
+
+class TagTestCase(TestCase):
+    def setUp(self) -> None:
+        self.t = Tag.objects.create(name="test")
+
+    def test_tag_created(self):
+        self.assertEqual(Tag.objects.count(), 1)
+        t = Tag.objects.first()
+        self.assertEqual(t.name, "test")
+        self.assertEqual(t.__str__(), "test")
+
+    def test_tag_name_validation(self):
+        t1 = Tag(name=123)
+        t2 = Tag(name="123")
+        t3 = Tag(name="test12")
+        t4 = Tag(name="test test")
+        self.assertRaises(ValidationError, t1.full_clean)
+        self.assertRaises(ValidationError, t2.full_clean)
+        self.assertRaises(ValidationError, t3.full_clean)
+        self.assertRaises(ValidationError, t4.full_clean)
