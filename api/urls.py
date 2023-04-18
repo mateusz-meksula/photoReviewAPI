@@ -13,6 +13,7 @@ urlpatterns = [
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
+# models urls
 router = DefaultRouter()
 router.register(r"photos", views.PhotoViewSet, basename="photo")
 urlpatterns += router.urls

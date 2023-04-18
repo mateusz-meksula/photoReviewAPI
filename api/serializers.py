@@ -4,6 +4,10 @@ from .models import Photo
 
 
 class PhotoCreateSerializer(serializers.ModelSerializer):
+    """
+    Photo serializer for create action.
+    """
+
     image = serializers.ImageField(required=True)
 
     class Meta:
@@ -12,6 +16,10 @@ class PhotoCreateSerializer(serializers.ModelSerializer):
 
 
 class PhotoDetailSerializer(serializers.ModelSerializer):
+    """
+    Photo serializer for retrieve and list actions.
+    """
+
     author = serializers.CharField(source="author.username")
 
     class Meta:
@@ -20,6 +28,11 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
 
 
 class PhotoPatchSerializer(serializers.ModelSerializer):
+    """
+    Photo serializer for patch method.
+    Only `title` and `description` could by modified.
+    """
+
     class Meta:
         model = Photo
         fields = ["title", "description"]

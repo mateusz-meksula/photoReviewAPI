@@ -150,6 +150,15 @@ class PhotoDeleteTestCase(APITestCase):
         if os.path.isfile("media/photos/test_title.png"):
             os.remove("media/photos/test_title.png")
 
+    def test_delete_after_patch(self):
+        url = f"{self.url}{self.p.id}/"
+        data = {"title": "new title"}
+        self.author.patch(url, data)
+        r = self.author.delete(url)
+        self.assertNotEqual(r.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(os.path.isfile("media/photos/new_title.png"))
+
 
 class PhotoRetrieveTestCase(APITestCase):
     def setUp(self) -> None:
