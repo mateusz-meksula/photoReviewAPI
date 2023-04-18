@@ -141,3 +141,7 @@ from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
 }
+
+FLASH_SETTINGS = {
+    "ACTIVATE_ACCOUNT": False,
+}

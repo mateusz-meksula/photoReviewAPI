@@ -17,4 +17,5 @@ urlpatterns = [
 router = DefaultRouter()
 router.register(r"photos", views.PhotoViewSet, basename="photo")
 router.register(r"tags", views.TagViewSet, basename="tag")
+router.register(r"reviews", views.ReviewViewSet, basename="review")
 urlpatterns += router.urls

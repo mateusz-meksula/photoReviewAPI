@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Photo, Tag
+from .models import Photo, Tag, Review
 
 
 class PhotoCreateSerializer(serializers.ModelSerializer):
@@ -79,3 +79,35 @@ class TagDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ["id", "name", "photos"]
+
+
+class ReviewCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "photo", "rating", "body"]
+
+
+class ReviewListSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source="author.username")
+    photo = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="photo-detail"
+    )
+
+    class Meta:
+        model = Review
+        fields = ["id", "author", "photo", "rating", "body"]
+
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source="author.username")
+    photo = PhotoDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Review
+        fields = "__all__"
+
+
+class ReviewPatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["rating", "body"]
