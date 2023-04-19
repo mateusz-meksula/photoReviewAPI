@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 
 from ..models import Photo, Tag
-from ..serializers import PhotoDetailSerializer
+from ..serializers import PhotoDetailSerializer, PhotoListSerializer
 
 User = get_user_model()
 
@@ -113,7 +113,9 @@ class PhotoListTestCase(APITestCase):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         photos = Photo.objects.all()
-        expected_data = PhotoDetailSerializer(photos, many=True).data
+        expected_data = PhotoListSerializer(
+            photos, many=True, context={"request": None}
+        ).data
 
         data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))

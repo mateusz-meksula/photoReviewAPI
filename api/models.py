@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinValueValidator,
@@ -39,8 +40,20 @@ class BaseModel(models.Model):
     Base Model class for shared fields.
     """
 
-    created_at = models.DateTimeField(db_index=True, auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(db_index=True, editable=False)
+    updated_at = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Sets `created_at` field when instance is created.
+        Sets `updated_at` field when instance is updated.
+        """
+        
+        if not self.id:
+            self.created_at = timezone.now()
+        else:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

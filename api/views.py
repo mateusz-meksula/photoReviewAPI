@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework import generics
 from rest_framework import permissions
+from django.shortcuts import get_object_or_404
 
 from .models import Photo, Tag, Review
 from . import serializers
@@ -36,7 +36,9 @@ class PhotoViewSet(ModelViewSet):
 
         if self.action == "create":
             return serializers.PhotoCreateSerializer
-        if self.action in ("list", "retrieve", "destroy"):
+        if self.action == "list":
+            return serializers.PhotoListSerializer
+        if self.action in ("retrieve", "destroy"):
             return serializers.PhotoDetailSerializer
         if self.action == "partial_update":
             return serializers.PhotoPatchSerializer
@@ -65,7 +67,7 @@ class ReviewViewSet(ModelViewSet):
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
 
     def get_queryset(self):
-        photo = Photo.objects.get(id=self.kwargs["photo_id"])
+        photo = get_object_or_404(Photo, pk=self.kwargs["photo_id"])
         return photo.reviews.all()
 
     def get_permissions(self):
@@ -99,7 +101,8 @@ class ReviewViewSet(ModelViewSet):
         """
         Assigns authenticated user to the review instance.
         """
-        photo = Photo.objects.get(id=self.kwargs["photo_id"])
+
+        photo = get_object_or_404(Photo, pk=self.kwargs["photo_id"])
         serializer.save(author=self.request.user, photo=photo)
 
 
