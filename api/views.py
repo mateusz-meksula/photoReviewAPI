@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework import generics
 from rest_framework import permissions
 
 from .models import Photo, Tag, Review
@@ -63,6 +64,10 @@ class ReviewViewSet(ModelViewSet):
     # exclude `put` HTTP method
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
 
+    def get_queryset(self):
+        photo = Photo.objects.get(id=self.kwargs["photo_id"])
+        return photo.reviews.all()
+
     def get_permissions(self):
         """
         Set permission depending on the action.
@@ -94,7 +99,8 @@ class ReviewViewSet(ModelViewSet):
         """
         Assigns authenticated user to the review instance.
         """
-        serializer.save(author=self.request.user)
+        photo = Photo.objects.get(id=self.kwargs["photo_id"])
+        serializer.save(author=self.request.user, photo=photo)
 
 
 class IsAuthor(permissions.BasePermission):

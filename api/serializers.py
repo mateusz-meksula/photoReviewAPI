@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Avg
 
 from .models import Photo, Tag, Review
 
@@ -34,10 +35,18 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
 
     author = serializers.CharField(source="author.username")
     tags = serializers.StringRelatedField(many=True)
+    average_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Photo
         fields = "__all__"
+
+    def get_average_rating(self, obj):
+        reviews = obj.reviews.all()
+        avg_rating = reviews.aggregate(Avg("rating"))
+        avg_rating = avg_rating["rating__avg"]
+        avg_rating = round(avg_rating, 2)
+        return avg_rating
 
 
 class PhotoPatchSerializer(serializers.ModelSerializer):
@@ -84,18 +93,18 @@ class TagDetailSerializer(serializers.ModelSerializer):
 class ReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["id", "photo", "rating", "body"]
+        fields = ["id", "rating", "body"]
 
 
 class ReviewListSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source="author.username")
-    photo = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name="photo-detail"
-    )
+    # photo = serializers.HyperlinkedRelatedField(
+    #     read_only=True, view_name="photo-detail"
+    # )
 
     class Meta:
         model = Review
-        fields = ["id", "author", "photo", "rating", "body"]
+        fields = ["id", "author", "rating", "body"]
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
