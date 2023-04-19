@@ -36,7 +36,9 @@ class PhotoViewSet(ModelViewSet):
 
         if self.action == "create":
             return serializers.PhotoCreateSerializer
-        if self.action in ("list", "retrieve", "destroy"):
+        if self.action == "list":
+            return serializers.PhotoListSerializer
+        if self.action in ("retrieve", "destroy"):
             return serializers.PhotoDetailSerializer
         if self.action == "partial_update":
             return serializers.PhotoPatchSerializer
