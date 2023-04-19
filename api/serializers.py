@@ -5,9 +5,18 @@ from rest_framework.reverse import reverse
 from .models import Photo, Tag, Review
 
 
-class ReviewHyperLink(serializers.HyperlinkedRelatedField):
+class ReviewRelatedHyperLink(serializers.HyperlinkedRelatedField):
     view_name = "review-detail"
 
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            "photo_id": obj.photo.id,
+            "pk": obj.id,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class ReviewIdHyperLink(serializers.HyperlinkedIdentityField):
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
             "photo_id": obj.photo.id,
@@ -48,14 +57,24 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source="author.username")
     tags = serializers.StringRelatedField(many=True)
     average_rating = serializers.SerializerMethodField()
-    # reviews = serializers.HyperlinkedRelatedField(
-    #     many=True, read_only=True, view_name="review-detail"
-    # )
-    reviews = ReviewHyperLink(many=True, read_only=True)
+    reviews = ReviewRelatedHyperLink(many=True, read_only=True)
+    created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
+    updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
 
     class Meta:
         model = Photo
-        fields = "__all__"
+        fields = [
+            "id",
+            "author",
+            "title",
+            "image",
+            "description",
+            "average_rating",
+            "created_at",
+            "updated_at",
+            "tags",
+            "reviews",
+        ]
 
     def get_average_rating(self, obj):
         reviews = obj.reviews.all()
@@ -139,19 +158,30 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 class ReviewListSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source="author.username")
+    url = ReviewIdHyperLink(view_name="review-detail")
 
     class Meta:
         model = Review
-        fields = ["id", "author", "rating", "body"]
+        fields = ["id", "url", "author", "rating", "body"]
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source="author.username")
-    photo = PhotoDetailSerializer(read_only=True)
+    photo = PhotoListSerializer(read_only=True)
+    created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
+    updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
 
     class Meta:
         model = Review
-        fields = "__all__"
+        fields = [
+            "id",
+            "author",
+            "rating",
+            "body",
+            "created_at",
+            "updated_at",
+            "photo",
+        ]
 
 
 class ReviewPatchSerializer(serializers.ModelSerializer):
