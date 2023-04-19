@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from ..models import Photo, Tag
+from ..models import Photo, Tag, Review
 from ..serializers import PhotoDetailSerializer, PhotoListSerializer
 
 User = get_user_model()
@@ -212,11 +212,31 @@ class PhotoRetrieveTestCase(APITestCase):
         t1 = Tag.objects.create(name="drf")
         t2 = Tag.objects.create(name="test")
         p.tags.add(t1, t2)
+
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         expected_data = PhotoDetailSerializer(p).data
         data_str = str(r.data).replace("http://testserver", "")
+        self.assertEqual(data_str, str(expected_data))
 
+    def test_qs_returned_with_reviews(self):
+        u = User.objects.create_user(
+            username="reviewer",
+            email="reviewer@test.com",
+            password="reviewer123",
+        )
+        review = Review.objects.create(
+            author=u,
+            photo=self.p,
+            rating=4,
+            body="Good photo",
+        )
+        self.p.refresh_from_db()
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        expected_data = PhotoDetailSerializer(self.p, context={"request": None}).data
+        data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
     def test_photo_not_found(self):
