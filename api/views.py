@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from django.core.exceptions import PermissionDenied
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 
@@ -100,9 +101,16 @@ class ReviewViewSet(ModelViewSet):
     def perform_create(self, serializer):
         """
         Assigns authenticated user to the review instance.
+        Returns 403 if user tries to review his own photo.
+        Returns 404 if user tries to review same photo twice.
         """
 
         photo = get_object_or_404(Photo, pk=self.kwargs["photo_id"])
+        if self.request.user == photo.author:
+            raise PermissionDenied()
+        if photo.reviews.filter(author=self.request.user):
+            raise PermissionDenied()
+
         serializer.save(author=self.request.user, photo=photo)
 
 

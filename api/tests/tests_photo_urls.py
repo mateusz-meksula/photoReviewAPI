@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from ..models import Photo, Tag
+from ..models import Photo, Tag, Review
 from ..serializers import PhotoDetailSerializer, PhotoListSerializer
 
 User = get_user_model()
@@ -58,7 +58,11 @@ class PhotoCreateTestCase(APITestCase):
         self.assertEqual(p.description, "test description")
         self.assertEqual(Tag.objects.count(), 2)
         self.assertEqual(p.tags.count(), 2)
-        self.assertQuerysetEqual(Tag.objects.all(), p.tags.all(), ordered=False)
+        self.assertQuerysetEqual(
+            Tag.objects.all(),
+            p.tags.all(),
+            ordered=False,
+        )
 
     def test_missing_image(self):
         self.data.pop("image", None)
@@ -153,12 +157,14 @@ class PhotoDeleteTestCase(APITestCase):
         self.assertNotEqual(r.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(os.path.isfile("media/photos/test_title.png"))
+        self.assertEqual(Photo.objects.count(), 0)
 
     def test_non_author_cant_delete(self):
         url = f"{self.url}{self.p.id}/"
         r = self.non_author.delete(url)
         self.assertNotEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Photo.objects.count(), 1)
 
         if os.path.isfile("media/photos/test_title.png"):
             os.remove("media/photos/test_title.png")
@@ -171,11 +177,12 @@ class PhotoDeleteTestCase(APITestCase):
         self.assertNotEqual(r.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(os.path.isfile("media/photos/new_title.png"))
+        self.assertEqual(Photo.objects.count(), 0)
 
     def test_tag_not_deleted(self):
         self.assertEqual(Tag.objects.count(), 1)
         url = f"{self.url}{self.p.id}/"
-        r = self.author.delete(url)
+        self.author.delete(url)
         self.assertEqual(Tag.objects.count(), 1)
 
 
@@ -212,11 +219,34 @@ class PhotoRetrieveTestCase(APITestCase):
         t1 = Tag.objects.create(name="drf")
         t2 = Tag.objects.create(name="test")
         p.tags.add(t1, t2)
+
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         expected_data = PhotoDetailSerializer(p).data
         data_str = str(r.data).replace("http://testserver", "")
+        self.assertEqual(data_str, str(expected_data))
 
+    def test_qs_returned_with_reviews(self):
+        u = User.objects.create_user(
+            username="reviewer",
+            email="reviewer@test.com",
+            password="reviewer123",
+        )
+        Review.objects.create(
+            author=u,
+            photo=self.p,
+            rating=4,
+            body="Good photo",
+        )
+        self.p.refresh_from_db()
+
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        expected_data = PhotoDetailSerializer(
+            self.p,
+            context={"request": None},
+        ).data
+        data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
     def test_photo_not_found(self):
