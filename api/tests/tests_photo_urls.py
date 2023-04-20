@@ -58,7 +58,11 @@ class PhotoCreateTestCase(APITestCase):
         self.assertEqual(p.description, "test description")
         self.assertEqual(Tag.objects.count(), 2)
         self.assertEqual(p.tags.count(), 2)
-        self.assertQuerysetEqual(Tag.objects.all(), p.tags.all(), ordered=False)
+        self.assertQuerysetEqual(
+            Tag.objects.all(),
+            p.tags.all(),
+            ordered=False,
+        )
 
     def test_missing_image(self):
         self.data.pop("image", None)
@@ -153,12 +157,14 @@ class PhotoDeleteTestCase(APITestCase):
         self.assertNotEqual(r.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(os.path.isfile("media/photos/test_title.png"))
+        self.assertEqual(Photo.objects.count(), 0)
 
     def test_non_author_cant_delete(self):
         url = f"{self.url}{self.p.id}/"
         r = self.non_author.delete(url)
         self.assertNotEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Photo.objects.count(), 1)
 
         if os.path.isfile("media/photos/test_title.png"):
             os.remove("media/photos/test_title.png")
@@ -171,11 +177,12 @@ class PhotoDeleteTestCase(APITestCase):
         self.assertNotEqual(r.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(os.path.isfile("media/photos/new_title.png"))
+        self.assertEqual(Photo.objects.count(), 0)
 
     def test_tag_not_deleted(self):
         self.assertEqual(Tag.objects.count(), 1)
         url = f"{self.url}{self.p.id}/"
-        r = self.author.delete(url)
+        self.author.delete(url)
         self.assertEqual(Tag.objects.count(), 1)
 
 
@@ -225,7 +232,7 @@ class PhotoRetrieveTestCase(APITestCase):
             email="reviewer@test.com",
             password="reviewer123",
         )
-        review = Review.objects.create(
+        Review.objects.create(
             author=u,
             photo=self.p,
             rating=4,
@@ -235,7 +242,10 @@ class PhotoRetrieveTestCase(APITestCase):
 
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        expected_data = PhotoDetailSerializer(self.p, context={"request": None}).data
+        expected_data = PhotoDetailSerializer(
+            self.p,
+            context={"request": None},
+        ).data
         data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
