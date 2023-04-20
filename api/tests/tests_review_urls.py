@@ -75,3 +75,41 @@ class ReviewCreateTestCase(APITestCase):
         r = self.author.post(self.url, self.data)
         self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Review.objects.count(), 0)
+
+    def test_reviewer_cant_review_twice(self):
+        self.reviewer.post(self.url, self.data)
+        self.data["rating"] = 2
+        self.data["body"] = "bad photo"
+        r = self.reviewer.post(self.url, self.data)
+        self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# class ReviewListTestCase(APITestCase):
+#     def setUp(self) -> None:
+#         u = User.objects.create_user(
+#             username="testUser",
+#             email="testemail@test.com",
+#             password="testpassword123",
+#         )
+#         reviewer = User.objects.create_user(
+#             username="reviewer",
+#             email="reviewer@test.com",
+#             password="reviewer123",
+#         )
+#         self.p = Photo.objects.create(
+#             author=u,
+#             image=create_image(),
+#             title="test title",
+#             description="test",
+#         )
+#         self.review = Review.objects.create(
+#             author=reviewer,
+#             photo=self.p
+#             rating=4,
+#             body="good photo",
+#         )
+#         self.url = f"/api/photos/{self.p.id}/reviews/"
+
+#     def tearDown(self) -> None:
+#         if os.path.isfile("media/photos/test_title.png"):
+#             os.remove("media/photos/test_title.png")
