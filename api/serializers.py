@@ -116,6 +116,7 @@ class PhotoPatchSerializer(serializers.ModelSerializer):
     """
 
     tags = serializers.ListField(write_only=True, required=False)
+    title = serializers.CharField(required=False)
 
     class Meta:
         model = Photo
