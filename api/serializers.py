@@ -137,18 +137,26 @@ class TagListSerializer(serializers.ModelSerializer):
     photos = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="photo-detail"
     )
+    number_of_photos = serializers.SerializerMethodField()
 
     class Meta:
         model = Tag
-        fields = ["id", "name", "photos"]
+        fields = ["id", "name", "number_of_photos", "photos"]
+
+    def get_number_of_photos(self, obj):
+        return obj.photos.count()
 
 
 class TagDetailSerializer(serializers.ModelSerializer):
-    photos = PhotoDetailSerializer(many=True, read_only=True)
+    photos = PhotoListSerializer(many=True, read_only=True)
+    number_of_photos = serializers.SerializerMethodField()
 
     class Meta:
         model = Tag
-        fields = ["id", "name", "photos"]
+        fields = ["id", "name", "number_of_photos", "photos"]
+
+    def get_number_of_photos(self, obj):
+        return obj.photos.count()
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
