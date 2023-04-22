@@ -74,7 +74,10 @@ class TagUrlsTestCase(APITestCase):
         url = f"{self.url}{self.t1.name}/"
         r = self.client.get(url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        expected_data = TagDetailSerializer(self.t1).data
+        expected_data = TagDetailSerializer(
+            self.t1,
+            context={"request": None},
+        ).data
         data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
