@@ -194,6 +194,8 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
 
 
 class ReviewPatchSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(required=False)
+
     class Meta:
         model = Review
         fields = ["rating", "body"]
