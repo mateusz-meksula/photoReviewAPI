@@ -56,6 +56,16 @@ class PhotoViewSet(ModelViewSet):
         """
         serializer.save(author=self.request.user)
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        Limits results if 'limit' query parameter is given.
+        """
+
+        limit = self.request.query_params.get("limit")
+        if limit:
+            response.data = response.data[: int(limit)]
+        return super().finalize_response(request, response, *args, **kwargs)
+
 
 class TagViewSet(ReadOnlyModelViewSet):
     """
@@ -69,6 +79,16 @@ class TagViewSet(ReadOnlyModelViewSet):
     ordering_fields = ["name", "number_of_photos"]
     ordering = ["-number_of_photos", "name"]
     lookup_field = "name"
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        Limits results if 'limit' query parameter is given.
+        """
+
+        limit = self.request.query_params.get("limit")
+        if limit:
+            response.data = response.data[: int(limit)]
+        return super().finalize_response(request, response, *args, **kwargs)
 
 
 class ReviewViewSet(ModelViewSet):
