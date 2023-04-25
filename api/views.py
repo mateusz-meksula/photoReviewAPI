@@ -1,10 +1,10 @@
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from django.core.exceptions import PermissionDenied
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import Photo, Tag, Review
 from . import serializers
+from .models import Photo, Tag, Review
 
 
 class PhotoViewSet(ModelViewSet):
@@ -12,14 +12,13 @@ class PhotoViewSet(ModelViewSet):
     ViewSet for Photo instances management.
     """
 
-    queryset = Photo.objects.all()
-
     # exclude `put` HTTP method
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
+    queryset = Photo.objects.all()
 
     def get_permissions(self):
         """
-        Set permission depending on the action.
+        Sets permission depending on the action.
         """
 
         if self.action in ("list", "retrieve"):
@@ -32,7 +31,7 @@ class PhotoViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         """
-        Set serializer class depending on the action.
+        Sets serializer class depending on the action.
         """
 
         if self.action == "create":
@@ -52,10 +51,18 @@ class PhotoViewSet(ModelViewSet):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
+    """
+    ViewSet for Tag instances.
+    """
+
     queryset = Tag.objects.all()
     lookup_field = "name"
 
     def get_serializer_class(self):
+        """
+        Sets serializer class depending on the action.
+        """
+
         if self.action == "list":
             return serializers.TagListSerializer
         if self.action == "retrieve":
@@ -63,11 +70,18 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
+    """
+    ViewSet for Review instances management.
+    """
+
     # exclude `put` HTTP method
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
 
     def get_queryset(self):
+        """
+        Returns reviews of photo related to a given `photo_id` in the url.
+        """
+
         photo = get_object_or_404(Photo, pk=self.kwargs["photo_id"])
         return photo.reviews.all()
 
@@ -116,7 +130,8 @@ class ReviewViewSet(ModelViewSet):
 
 class IsAuthor(permissions.BasePermission):
     """
-    Grants author object permission.
+    Custom `BasePermission`.
+    Grants the author an object permission.
     """
 
     def has_object_permission(self, request, view, obj):
