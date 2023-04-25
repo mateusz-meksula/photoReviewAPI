@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinValueValidator,
@@ -31,8 +31,12 @@ def image_size_validator(image):
 
 
 def tag_name_validator(name: str):
+    """
+    Raise `ValidationError` when provided tag name contains non-alphabetic characters.
+    """
+
     if not name.isalpha():
-        raise ValidationError("Tag name must be an alphabetic string.")
+        raise ValidationError("Tag name must contain only alphabetic characters.")
 
 
 class BaseModel(models.Model):
@@ -48,7 +52,7 @@ class BaseModel(models.Model):
         Sets `created_at` field when instance is created.
         Sets `updated_at` field when instance is updated.
         """
-        
+
         if not self.id:
             self.created_at = timezone.now()
         else:
@@ -60,6 +64,10 @@ class BaseModel(models.Model):
 
 
 class Tag(models.Model):
+    """
+    Model class for tagging system.
+    """
+
     name = models.CharField(
         max_length=20, unique=True, db_index=True, validators=[tag_name_validator]
     )
