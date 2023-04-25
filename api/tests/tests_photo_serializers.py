@@ -1,6 +1,7 @@
 import os
 from PIL import Image
 from io import BytesIO
+from django.db.models import Avg
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -86,13 +87,15 @@ class PhotoDetailSerializerTestCase(TestCase):
             rating=4,
             body="good test photo",
         )
+        self.qs = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
 
     def tearDown(self) -> None:
         if os.path.isfile("media/photos/test_title.png"):
             os.remove("media/photos/test_title.png")
 
     def test_serializer_returns_expected_data(self):
-        s = PhotoDetailSerializer(instance=self.p, context={"request": None})
+        inst = self.qs.get(id=self.p.id)
+        s = PhotoDetailSerializer(instance=inst, context={"request": None})
         expected_data = {
             "id": self.p.id,
             "author": "testUser",
@@ -127,6 +130,7 @@ class PhotoListSerializerTestCase(TestCase):
             title="test title 2",
             description="test description 2",
         )
+        self.qs = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
 
     def tearDown(self) -> None:
         if os.path.isfile("media/photos/test_title_1.png"):
@@ -135,17 +139,12 @@ class PhotoListSerializerTestCase(TestCase):
             os.remove("media/photos/test_title_2.png")
 
     def test_serializer_returns_expected_data(self):
-        photos = Photo.objects.all()
-        s = PhotoListSerializer(photos, many=True, context={"request": None})
+        s = PhotoListSerializer(
+            self.qs,
+            many=True,
+            context={"request": None},
+        )
         expected_data = [
-            {
-                "id": self.p1.id,
-                "url": f"/api/photos/{self.p1.id}/",
-                "author": "testUser",
-                "title": "test title 1",
-                "image": "/media/photos/test_title_1.png",
-                "average_rating": None,
-            },
             {
                 "id": self.p2.id,
                 "url": f"/api/photos/{self.p2.id}/",
@@ -154,7 +153,16 @@ class PhotoListSerializerTestCase(TestCase):
                 "image": "/media/photos/test_title_2.png",
                 "average_rating": None,
             },
+            {
+                "id": self.p1.id,
+                "url": f"/api/photos/{self.p1.id}/",
+                "author": "testUser",
+                "title": "test title 1",
+                "image": "/media/photos/test_title_1.png",
+                "average_rating": None,
+            },
         ]
+
         self.assertEqual(s.data, expected_data)
 
 

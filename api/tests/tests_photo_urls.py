@@ -1,6 +1,7 @@
 import os
 from PIL import Image
 from io import BytesIO
+from django.db.models import Avg
 from rest_framework.test import APIClient, APITestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
@@ -116,12 +117,15 @@ class PhotoListTestCase(APITestCase):
     def test_qs_returned(self):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        photos = Photo.objects.all()
+        photos = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
         expected_data = PhotoListSerializer(
             photos, many=True, context={"request": None}
         ).data
 
-        data_str = str(r.data).replace("http://testserver", "")
+        data = sorted(r.data, key=lambda inst: inst["id"])
+        data_str = str(data).replace("http://testserver", "")
+        expected_data = sorted(expected_data, key=lambda inst: inst["id"])
+
         self.assertEqual(data_str, str(expected_data))
 
 
@@ -208,14 +212,16 @@ class PhotoRetrieveTestCase(APITestCase):
     def test_qs_returned(self):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        p = Photo.objects.first()
+        qs = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
+        p = qs.first()
         expected_data = PhotoDetailSerializer(p).data
 
         data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
     def test_qs_returned_with_tags(self):
-        p = Photo.objects.first()
+        qs = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
+        p = qs.first()
         t1 = Tag.objects.create(name="drf")
         t2 = Tag.objects.create(name="test")
         p.tags.add(t1, t2)
@@ -238,12 +244,14 @@ class PhotoRetrieveTestCase(APITestCase):
             rating=4,
             body="Good photo",
         )
-        self.p.refresh_from_db()
+        # self.p.refresh_from_db()
+        qs = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
+        p = qs.first()
 
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         expected_data = PhotoDetailSerializer(
-            self.p,
+            p,
             context={"request": None},
         ).data
         data_str = str(r.data).replace("http://testserver", "")

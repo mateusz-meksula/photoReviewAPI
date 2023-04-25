@@ -1,10 +1,12 @@
+from rest_framework import filters
+from django.db.models import Avg, Count
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from . import serializers
-from .models import Photo, Tag, Review
+from .models import Photo, Tag
 
 
 class PhotoViewSet(ModelViewSet):
@@ -14,7 +16,12 @@ class PhotoViewSet(ModelViewSet):
 
     # exclude `put` HTTP method
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
-    queryset = Photo.objects.all()
+
+    queryset = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["title", "description", "author__username", "tags__name"]
+    ordering_fields = ["created_at", "average_rating", "title"]
+    ordering = ["-created_at"]
 
     def get_permissions(self):
         """
@@ -55,18 +62,13 @@ class TagViewSet(ReadOnlyModelViewSet):
     ViewSet for Tag instances.
     """
 
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.annotate(number_of_photos=Count("photos"))
+    serializer_class = serializers.TagSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "photos__title"]
+    ordering_fields = ["name", "number_of_photos"]
+    ordering = ["-number_of_photos", "name"]
     lookup_field = "name"
-
-    def get_serializer_class(self):
-        """
-        Sets serializer class depending on the action.
-        """
-
-        if self.action == "list":
-            return serializers.TagListSerializer
-        if self.action == "retrieve":
-            return serializers.TagDetailSerializer
 
 
 class ReviewViewSet(ModelViewSet):
@@ -76,6 +78,9 @@ class ReviewViewSet(ModelViewSet):
 
     # exclude `put` HTTP method
     http_method_names = [m for m in ModelViewSet.http_method_names if m != "put"]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["created_at", "rating"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         """

@@ -1,13 +1,14 @@
 import os
 from PIL import Image
 from io import BytesIO
+from django.db.models import Count
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
 from ..models import Photo, Tag
-from ..serializers import TagDetailSerializer, TagListSerializer
+from ..serializers import TagSerializer
 
 User = get_user_model()
 
@@ -62,20 +63,24 @@ class TagUrlsTestCase(APITestCase):
     def test_list_tags(self):
         r = self.client.get(self.url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        tags = Tag.objects.all()
-        expected_data = TagListSerializer(
-            tags, many=True, context={"request": None}
+        tags = Tag.objects.annotate(number_of_photos=Count("photos"))
+        expected_data = TagSerializer(
+            tags,
+            many=True,
+            context={"request": None},
         ).data
 
         data_str = str(r.data).replace("http://testserver", "")
         self.assertEqual(data_str, str(expected_data))
 
     def test_retrieve_tag(self):
+        qs = Tag.objects.annotate(number_of_photos=Count("photos"))
+        t = qs.first()
         url = f"{self.url}{self.t1.name}/"
         r = self.client.get(url)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        expected_data = TagDetailSerializer(
-            self.t1,
+        expected_data = TagSerializer(
+            t,
             context={"request": None},
         ).data
         data_str = str(r.data).replace("http://testserver", "")

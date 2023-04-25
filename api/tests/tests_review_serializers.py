@@ -90,14 +90,7 @@ class ReviewDetailSerializerTestCase(TestCase):
             "body": "good test photo",
             "created_at": self.review.created_at.strftime("%d.%m.%Y %H:%M:%S"),
             "updated_at": None,
-            "photo": {
-                "id": self.p.id,
-                "url": f"/api/photos/{self.p.id}/",
-                "author": "testUser",
-                "title": "test title",
-                "image": "/media/photos/test_title.png",
-                "average_rating": 4.0,
-            },
+            "photo": f"/api/photos/{self.p.id}/",
         }
         self.assertEqual(s.data, expected_data)
 
