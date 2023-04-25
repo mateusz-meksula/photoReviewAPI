@@ -1,12 +1,13 @@
 import os
 from PIL import Image
 from io import BytesIO
+from django.db.models import Count
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from ..models import Photo, Tag
-from ..serializers import TagDetailSerializer, TagListSerializer
+from ..serializers import TagSerializer
 
 
 User = get_user_model()
@@ -22,7 +23,7 @@ def create_image():
     )
 
 
-class TagListSerializerTestCase(TestCase):
+class TagSerializerTestCase(TestCase):
     def setUp(self) -> None:
         u = User.objects.create_user(
             username="testUser",
@@ -65,16 +66,17 @@ class TagListSerializerTestCase(TestCase):
             os.remove("media/photos/test_title_3.png")
 
     def test_serializer_returns_expected_data(self):
-        tags = Tag.objects.all()
-        s = TagListSerializer(tags, many=True, context={"request": None})
+        tags = Tag.objects.annotate(number_of_photos=Count("photos"))
+        s = TagSerializer(tags, many=True, context={"request": None})
         expected_data = [
             {
-                "id": self.t1.id,
-                "name": "test",
-                "number_of_photos": 2,
+                "id": self.t4.id,
+                "name": "REST",
+                "number_of_photos": 3,
                 "photos": [
                     f"/api/photos/{self.p1.id}/",
                     f"/api/photos/{self.p2.id}/",
+                    f"/api/photos/{self.p3.id}/",
                 ],
             },
             {
@@ -94,71 +96,14 @@ class TagListSerializerTestCase(TestCase):
                 ],
             },
             {
-                "id": self.t4.id,
-                "name": "REST",
-                "number_of_photos": 3,
+                "id": self.t1.id,
+                "name": "test",
+                "number_of_photos": 2,
                 "photos": [
                     f"/api/photos/{self.p1.id}/",
                     f"/api/photos/{self.p2.id}/",
-                    f"/api/photos/{self.p3.id}/",
                 ],
             },
         ]
-        self.assertEqual(s.data, expected_data)
 
-
-class TagDetailSerializerTestCase(TestCase):
-    def setUp(self) -> None:
-        u = User.objects.create_user(
-            username="testUser",
-            email="testemail@test.com",
-            password="password123",
-        )
-        self.p1 = Photo.objects.create(
-            author=u,
-            image=create_image(),
-            title="test title 1",
-            description="description 1",
-        )
-        self.p2 = Photo.objects.create(
-            author=u,
-            image=create_image(),
-            title="test title 2",
-            description="description 2",
-        )
-        self.t = Tag.objects.create(name="test")
-        self.p1.tags.add(self.t)
-        self.p2.tags.add(self.t)
-
-    def tearDown(self) -> None:
-        if os.path.isfile("media/photos/test_title_1.png"):
-            os.remove("media/photos/test_title_1.png")
-        if os.path.isfile("media/photos/test_title_2.png"):
-            os.remove("media/photos/test_title_2.png")
-
-    def test_serializer_returns_expected_data(self):
-        s = TagDetailSerializer(instance=self.t, context={"request": None})
-        expected_data = {
-            "id": self.t.id,
-            "name": "test",
-            "number_of_photos": 2,
-            "photos": [
-                {
-                    "id": self.p1.id,
-                    "url": f"/api/photos/{self.p1.id}/",
-                    "author": "testUser",
-                    "title": "test title 1",
-                    "image": "/media/photos/test_title_1.png",
-                    "average_rating": None,
-                },
-                {
-                    "id": self.p2.id,
-                    "url": f"/api/photos/{self.p2.id}/",
-                    "author": "testUser",
-                    "title": "test title 2",
-                    "image": "/media/photos/test_title_2.png",
-                    "average_rating": None,
-                },
-            ],
-        }
         self.assertEqual(s.data, expected_data)

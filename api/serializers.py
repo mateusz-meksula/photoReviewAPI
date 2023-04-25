@@ -1,4 +1,3 @@
-from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -18,7 +17,12 @@ class ReviewRelatedHyperLink(serializers.HyperlinkedRelatedField):
             "photo_id": obj.photo.id,
             "pk": obj.id,
         }
-        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+        return reverse(
+            view_name,
+            kwargs=url_kwargs,
+            request=request,
+            format=format,
+        )
 
 
 class ReviewIdHyperLink(serializers.HyperlinkedIdentityField):
@@ -32,7 +36,12 @@ class ReviewIdHyperLink(serializers.HyperlinkedIdentityField):
             "photo_id": obj.photo.id,
             "pk": obj.id,
         }
-        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+        return reverse(
+            view_name,
+            kwargs=url_kwargs,
+            request=request,
+            format=format,
+        )
 
 
 class PhotoCreateSerializer(serializers.ModelSerializer):
@@ -69,7 +78,7 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
 
     author = serializers.CharField(source="author.username")
     tags = serializers.StringRelatedField(many=True)
-    average_rating = serializers.SerializerMethodField()
+    average_rating = serializers.FloatField()
     reviews = ReviewRelatedHyperLink(many=True, read_only=True)
     created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
     updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
@@ -89,18 +98,6 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
             "reviews",
         ]
 
-    def get_average_rating(self, obj):
-        """
-        Returns average of all given ratings.
-        """
-
-        reviews = obj.reviews.all()
-        if reviews:
-            avg = reviews.aggregate(Avg("rating"))
-            return round(avg["rating__avg"], 2)
-        else:
-            return None
-
 
 class PhotoListSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -108,7 +105,7 @@ class PhotoListSerializer(serializers.HyperlinkedModelSerializer):
     """
 
     author = serializers.CharField(source="author.username")
-    average_rating = serializers.SerializerMethodField()
+    average_rating = serializers.FloatField()
 
     class Meta:
         model = Photo
@@ -120,18 +117,6 @@ class PhotoListSerializer(serializers.HyperlinkedModelSerializer):
             "image",
             "average_rating",
         ]
-
-    def get_average_rating(self, obj):
-        """
-        Returns average of all given ratings.
-        """
-
-        reviews = obj.reviews.all()
-        if reviews:
-            avg = reviews.aggregate(Avg("rating"))
-            return round(avg["rating__avg"], 2)
-        else:
-            return None
 
 
 class PhotoPatchSerializer(serializers.ModelSerializer):
@@ -162,7 +147,7 @@ class PhotoPatchSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class TagListSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     """
     Tag serializer for list action.
     """
@@ -170,37 +155,11 @@ class TagListSerializer(serializers.ModelSerializer):
     photos = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="photo-detail"
     )
-    number_of_photos = serializers.SerializerMethodField()
+    number_of_photos = serializers.IntegerField()
 
     class Meta:
         model = Tag
         fields = ["id", "name", "number_of_photos", "photos"]
-
-    def get_number_of_photos(self, obj):
-        """
-        Returns number of photos tagged with tag.
-        """
-
-        return obj.photos.count()
-
-
-class TagDetailSerializer(serializers.ModelSerializer):
-    """
-    Tag serializer for retrieve action.
-    """
-
-    photos = PhotoListSerializer(many=True, read_only=True)
-    number_of_photos = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Tag
-        fields = ["id", "name", "number_of_photos", "photos"]
-
-    def get_number_of_photos(self, obj):
-        """
-        Returns number of photos tagged with tag.
-        """
-        return obj.photos.count()
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -232,7 +191,9 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
     """
 
     author = serializers.CharField(source="author.username")
-    photo = PhotoListSerializer(read_only=True)
+    photo = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="photo-detail"
+    )
     created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
     updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M:%S")
 
