@@ -102,6 +102,8 @@ textarea {
     border-radius: 0.3rem;
 
     font-family: monospace;
+    font-family: Poppins;
+    letter-spacing: 2px;
     line-height: 1.5;
 
     width: 100%;
@@ -145,6 +147,11 @@ input[type="file"] {
     overflow-x: scroll;
 
     transition: background-color 0.2s;
+}
+
+code {
+    font-family: Poppins;
+    letter-spacing: 2px;
 }
 
 .dark-field {
@@ -261,6 +268,18 @@ button,
 
 *::-webkit-scrollbar-thumb {
     background-color: rgba(14, 14, 14, 0.4);
+    border-radius: 1rem;
+}
+
+.code::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+    background-color: rgba(53, 53, 53, 0.4);
+    border-radius: 1rem;
+}
+
+.code::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(110, 110, 110, 0.4);
     border-radius: 1rem;
 }
 
