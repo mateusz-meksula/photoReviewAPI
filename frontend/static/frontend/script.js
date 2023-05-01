@@ -141,3 +141,24 @@ async function makeRequest() {
 makeRequestButton.addEventListener("click", () => {
     makeRequest()
 })
+
+function prettyFormat() {
+    let userData = userDataInput.value
+    try {
+        pre_data = JSON.parse(userData)
+        formatted_data = JSON.stringify(pre_data, null, 4)
+        userDataInput.value = formatted_data
+    } catch (e) {
+        if (e instanceof SyntaxError) {
+            responseDataElement.textContent = "There is an error with your data."
+        }
+        console.error(e)
+    }
+}
+
+document.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.keyCode == 80) {
+        e.preventDefault()
+        prettyFormat()
+    }
+})
