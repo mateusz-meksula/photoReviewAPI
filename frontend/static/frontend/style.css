@@ -206,6 +206,16 @@ button,
     cursor: pointer;
 }
 
+#cancel-file {
+    border: none;
+    background: transparent;
+}
+
+#cancel-file > i {
+    padding-left: 1rem;
+    color: white;
+}
+
 @media (min-width: 85rem) {
     main {
         margin: 2rem;
