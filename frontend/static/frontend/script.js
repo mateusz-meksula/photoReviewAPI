@@ -40,8 +40,6 @@ cancelFileButton.addEventListener("click", () => {
     cancelFileButton.style.display = 'none'
 })
 
-
-
 function buildUrl() {
     // don't allow to make request without specifying API endpoint
     if (!apiEndpointInput.value) {
@@ -66,7 +64,7 @@ function setRequestBody(method, contentType) {
     
     // don't allow to make request without specifying request data
     if (!userDataInput.value) {
-        userDataInput.textContent = "Please enter data here."
+        userDataInput.value = "Please enter data here."
         throw new Error
     }
 
@@ -115,6 +113,11 @@ async function makeRequest() {
     // don't send any data when HTTP method is 'GET' or 'DELETE'
     if (method === "GET" || method === "DELETE") {
         delete options.body
+    }
+
+    // don't send access token when it is not necessary
+    if (method == "GET") {
+        delete headers.Authorization
     }
 
     // allow fetch to set 'multipart/form-data'
