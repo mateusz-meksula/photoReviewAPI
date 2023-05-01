@@ -43,6 +43,12 @@ cancelFileButton.addEventListener("click", () => {
 
 
 function buildUrl() {
+    // don't allow to make request without specifying API endpoint
+    if (!apiEndpointInput.value) {
+        apiEndpointInput.value = "Please enter an API endpoint."
+        throw new Error
+    }
+
     let url = `${scheme}://${host}${apiEndpointInput.value}`
     return url
 }
@@ -57,10 +63,26 @@ function determineContentType() {
 function setRequestBody(method, contentType) {
     // don't search for data when HTTP method is 'GET' or 'DELETE'
     if (method === "GET" || method === "DELETE") return null
+    
+    // don't allow to make request without specifying request data
+    if (!userDataInput.value) {
+        userDataInput.textContent = "Please enter data here."
+        throw new Error
+    }
+
+    // don't allow to make request with invalid data
+    let userData
+    try {
+        userData = JSON.parse(userDataInput.value)
+    } catch (e) {
+        if (e instanceof SyntaxError) {
+            responseDataElement.textContent = "There is an error with your data."
+        }
+        throw new Error
+    }
 
     // set request body as form data if file is present
     // otherwise, as JSON string
-    let userData = JSON.parse(userDataInput.value)
     if (contentType !== "application/json") {
         let body = new FormData()
         body.append("image", fileInput.files[0])
@@ -105,8 +127,7 @@ async function makeRequest() {
     const data = await response.json()
 
     // print results on the page
-    // responseDataElement.textContent = JSON.stringify(data, null, 2)
-    responseDataElement.textContent = `STATUS CODE: ${response.status}\n\n${JSON.stringify(data, null, 2)}` 
+    responseDataElement.textContent = `STATUS CODE: ${response.status}\n\n${JSON.stringify(data, null, 4)}` 
 
     // set auth header value
     if (url.slice(-6) === "token/") {
