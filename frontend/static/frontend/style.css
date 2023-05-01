@@ -1,0 +1,263 @@
+:root {
+    --dark-navy: 29, 38, 45;
+    --light-navy: 39, 53, 60;
+    --black: 13, 15, 17;
+}
+
+html {
+    font-size: 125%;
+    height: 100%;
+}
+
+body {
+    background-color: rgb(var(--dark-navy));
+    background-image: url(background.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: soft-light;
+    background-attachment: fixed;
+
+    color: white;
+    font-family: Poppins;
+
+    margin: 0;
+    min-height: 100%;
+    overflow: overlay;
+
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    margin: 1rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: auto;
+    padding: 0 clamp(1rem, calc((100% - 30rem) / 2), 50rem);
+
+    background-color: rgba(var(--black), 0.7);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    width: 7rem;
+    width: clamp(6.5rem, 23vw, 10rem);
+    font-size: clamp(0.65rem, 2vw, 0.95rem);
+}
+
+footer {
+    background-color: rgba(var(--black), 0.7);
+    font-size: 0.7rem;
+    font-size: clamp(0.55rem, 1vw, 0.7rem);
+
+    box-sizing: border-box;
+    width: 100%;
+
+    margin-top: auto;
+    padding: 1rem clamp(2rem, calc((100% - 30rem) / 2), 50rem);
+}
+
+h1 {
+    font-size: clamp(0.75rem, 3vw, 1.5rem);
+    font-family: Poppins;
+}
+
+h2 {
+    margin: 0;
+    margin-bottom: 1rem;
+    font-size: clamp(0.7rem, 2.5vw, 1.1rem);
+    font-weight: 600;
+}
+
+article {
+    background-color: rgba(var(--dark-navy), 0.75);
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+
+    padding: 1rem 1.5rem;
+    margin: 0 auto;
+    margin-bottom: 1.5rem;
+
+    min-width: 15rem;
+    max-width: 30rem;
+    height: 18rem;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+textarea {
+    color: white;
+
+    box-sizing: border-box;
+    border: none;
+    border-radius: 0.3rem;
+
+    font-family: monospace;
+    line-height: 1.5;
+
+    width: 100%;
+    height: 8rem;
+
+    padding: 1rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.4rem;
+
+    resize: none;
+    transition: background-color 0.2s;
+}
+
+pre {
+    margin: 0;
+}
+
+button {
+    cursor: pointer;
+}
+
+select {
+    width: 33%;
+}
+
+input[type="search"] {
+    width: 66%;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.code {
+    border-radius: 0.3rem;
+
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.4rem;
+
+    height: 12rem;
+    overflow-x: scroll;
+
+    transition: background-color 0.2s;
+}
+
+.dark-field {
+    color: white;
+
+    border: none;
+    border-radius: 0.3rem;
+    padding: 0.4rem 0.5rem;
+
+    transition: background-color 0.2s;
+}
+
+.flex-box-sa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+textarea:focus,
+input:focus {
+    outline: none;
+}
+
+.dark-field,
+textarea,
+#file-upload,
+.code {
+    background-color: rgba(var(--black), 0.7);
+}
+
+.dark-field:hover,
+textarea:hover,
+#file-upload:hover,
+.code:hover {
+    background-color: rgba(var(--black), 0.9);
+}
+
+select,
+input[type="search"],
+button {
+    font-family: Poppins;
+    font-weight: 400;
+}
+
+textarea,
+.code,
+.dark-field,
+button,
+#file-upload {
+    font-size: clamp(0.55rem, 2vw, 0.8rem);
+}
+
+#file-upload {
+    background-color: rgba(var(--black), 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+
+    cursor: pointer;
+}
+
+@media (min-width: 85rem) {
+    main {
+        margin: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    header {
+        padding: 0 clamp(2rem, calc((100% - 78rem) / 2), 50rem);
+    }
+
+    article {
+        margin: 0;
+        width: 100%;
+        max-width: 38rem;
+        height: 25rem;
+    }
+
+    textarea {
+        height: 14.2rem;
+    }
+
+    .code {
+        height: 18.5rem;
+    }
+
+    nav {
+        width: 13rem;
+    }
+
+    textarea,
+    .code {
+        font-size: 0.9rem;
+    }
+}
+
+*::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: rgba(14, 14, 14, 0.4);
+    border-radius: 1rem;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(14, 14, 14, 0.8);
+}
+
+*::-webkit-scrollbar-corner {
+    background-color: transparent;
+}

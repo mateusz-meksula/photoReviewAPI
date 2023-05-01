@@ -1,0 +1,36 @@
+{% extends "./base.html" %} {% block title %}Photo Review API{% endblock %} 
+
+{% block content %}
+<article id="request">
+    <h2>Request</h2>
+    <datalist id="urls">
+        <option value="/api/auth/"></option>
+        <option value="/api/photos/"></option>
+        <option value="/api/tags/"></option>
+    </datalist>
+    <div class="flex-box-sa">
+        <input class="dark-field" type="search" list="urls" />
+        <select class="dark-field" name="" id="">
+            <option value="">GET</option>
+            <option value="">POST</option>
+            <option value="">PATCH</option>
+            <option value="">DELETE</option>
+        </select>
+    </div>
+    <textarea name="" id="" rows=""></textarea>
+    <div class="flex-box-sa">
+        <label id="file-upload">
+            <input type="file" accept="image/*" />
+            <i class="fa-solid fa-file"></i>
+            File
+        </label>
+        <button class="dark-field">Make request</button>
+    </div>
+</article>
+<article id="response">
+    <h2>Response</h2>
+    <div class="code" id="response-data">
+        <pre><code></code></pre>
+    </div>
+</article>
+{% endblock content %}

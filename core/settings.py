@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "flash_accounts",
     "api",
+    "frontend",
 ]
 
 MIDDLEWARE = [

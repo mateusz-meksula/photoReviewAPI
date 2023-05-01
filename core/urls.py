@@ -7,6 +7,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # api endpoints
     path("api/", include("api.urls")),
+    # api web client
+    path("", include("frontend.urls")),
 ]
 
 # media files in development
