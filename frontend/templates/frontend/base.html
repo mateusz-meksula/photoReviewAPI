@@ -23,26 +23,26 @@
         <header>
             <h1>Photo Review API</h1>
             <nav>
-                <a href="#">
+                <a href="{% url 'home' %}">
                     <i class="fa-solid fa-house-chimney"></i>
                     Home
                 </a>
-                <a href="#">
+                <a href="{% url 'about' %}">
                     <i class="fa-solid fa-circle-question"></i>
                     About
                 </a>
             </nav>
         </header>
-        <main class="">{% block content %}{% endblock content %}</main>
+        {% block content %}{% endblock content %}
         <footer class="flex-box-sa">
             <p>
                 Created by
-                <a href="#">
+                <a href="https://github.com/mateusz-meksula">
                     <i class="fa-brands fa-github"></i>
                     Mateusz Meksuła
                 </a>
             </p>
-            <a href="#">
+            <a href="https://github.com/mateusz-meksula/photoReviewAPI">
                 <i class="fa-brands fa-github"></i>
                 Source code
             </a>

@@ -227,6 +227,15 @@ button,
     color: white;
 }
 
+#about {
+    background-color: rgba(var(--black), 0.7);
+    margin: 0 auto;
+    max-width: 30rem;
+    padding: 1rem 1.5rem;
+    font-size: clamp(0.55rem, 2vw, 0.9rem);
+    border-radius: 0.5rem;
+}
+
 @media (min-width: 85rem) {
     main {
         margin: 2rem;
