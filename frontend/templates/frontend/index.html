@@ -1,50 +1,53 @@
-{% extends "./base.html" %} {% block title %}Photo Review API{% endblock %} 
+{% extends "./base.html" %} 
+{% block title %}Photo Review API{% endblock %} 
 {% block content %}
-<article id="request">
-    <h2>Request</h2>
-    <datalist id="urls">
-        <option value="/api/auth/sign-up/"></option>
-        <option value="/api/auth/password-reset/"></option>
-        <option value="/api/auth/password-reset/confirm/{token}/"></option>
-        <option value="/api/auth/token/"></option>
-        <option value="/api/auth/token/refresh/"></option>
-        <option value="/api/photos/"></option>
-        <option value="/api/photos/{photo_id}/reviews/"></option>
-        <option value="/api/tags/"></option>
-    </datalist>
-    <div class="flex-box-sa">
-        <input
-            data-scheme="{{ request.scheme }}"
-            data-host="{{ request.get_host }}"
-            class="dark-field"
-            type="search"
-            list="urls"
-            id="api-endpoint"
-        />
-        <select class="dark-field" name="" id="http-method">
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PATCH">PATCH</option>
-            <option value="DELETE">DELETE</option>
-        </select>
-    </div>
-    <textarea name="" id="user-data" rows=""></textarea>
-    <div class="flex-box-sa">
-        <label id="file-upload" for="file-upload-input">
-            <input id="file-upload-input" type="file" accept="image/*" />
-            <i class="fa-solid fa-file"></i>
-            <span id="file-name">
-                File
-            </span>
-            <button id="cancel-file"><i class="fa-solid fa-trash"></i></button>
-        </label>
-        <button id="make-request" class="dark-field">Make request</button>
-    </div>
-</article>
-<article id="response">
-    <h2>Response</h2>
-    <div class="code" >
-        <pre><code id="response-data"></code></pre>
-    </div>
-</article>
+<main>
+    <article id="request">
+        <h2>Request</h2>
+        <datalist id="urls">
+            <option value="/api/auth/sign-up/"></option>
+            <option value="/api/auth/password-reset/"></option>
+            <option value="/api/auth/password-reset/confirm/{token}/"></option>
+            <option value="/api/auth/token/"></option>
+            <option value="/api/auth/token/refresh/"></option>
+            <option value="/api/photos/"></option>
+            <option value="/api/photos/{photo_id}/reviews/"></option>
+            <option value="/api/tags/"></option>
+        </datalist>
+        <div class="flex-box-sa">
+            <input
+                data-scheme="{{ request.scheme }}"
+                data-host="{{ request.get_host }}"
+                class="dark-field"
+                type="search"
+                list="urls"
+                id="api-endpoint"
+            />
+            <select class="dark-field" name="" id="http-method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PATCH">PATCH</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+        </div>
+        <textarea name="" id="user-data" rows=""></textarea>
+        <div class="flex-box-sa">
+            <label id="file-upload" for="file-upload-input">
+                <input id="file-upload-input" type="file" accept="image/*" />
+                <i class="fa-solid fa-file"></i>
+                <span id="file-name">
+                    File
+                </span>
+                <button id="cancel-file"><i class="fa-solid fa-trash"></i></button>
+            </label>
+            <button id="make-request" class="dark-field">Make request</button>
+        </div>
+    </article>
+    <article id="response">
+        <h2>Response</h2>
+        <div class="code" >
+            <pre><code id="response-data"></code></pre>
+        </div>
+    </article>
+</main>
 {% endblock content %}

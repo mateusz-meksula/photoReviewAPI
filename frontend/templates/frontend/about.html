@@ -1,0 +1,23 @@
+{% extends "./base.html" %} {% block title %}About{% endblock %} 
+{% block content %}
+<div id="about">
+    <h3>Photo Review API</h3>
+        Photo Review API is a web API that allows users to upload and rate images.
+    <br>
+    The API has the following functionalities:
+    <ul>
+        <li>user registration along with password reset functionality</li>
+        <li>JWT authentication</li>
+        <li>image upload</li>
+        <li>tags system for images</li>
+        <li>rating system for images</li>
+    </ul>
+
+    Photo Review API was built with Django and Django REST Framework, with data managed by a PostgreSQL database.
+
+    <h3>Frontend JavaScript client</h3>
+
+    For presentational purposes, this project includes a minimalistic frontend Django app that enables users to interact with the web API using a JavaScript API client.
+    
+</div>
+{% endblock content %}
