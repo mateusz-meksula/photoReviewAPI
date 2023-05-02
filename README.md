@@ -1,4 +1,4 @@
-# <img src="./photoreviewapi_header.jpg">
+# <img src="./photo_reviewapi_header.jpg">
 
 ## About the Project
 
