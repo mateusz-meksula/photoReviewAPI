@@ -17,24 +17,161 @@ Account management for the API is provided by [flash-accounts](https://github.co
 
 Photo Review API was built with Django and Django REST Framework, with data managed by a PostgreSQL database.
 
-## Overview
+## Using the API
 
-Photo Review API has the following endpoints:
+### Signing-up
 
-```python
-- /api/auth/sign-up/
-- /api/auth/password-reset/
-- /api/auth/password-reset/confirm/<str:token>/
-- /api/auth/token/
-- /api/auth/token/refresh/
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+        "username": "user1",
+        "email": "user01@user.com",
+        "password": "user1password123",
+        "password2": "user1password123"
+    }' \
+    http://localhost:8000/api/auth/sign-up/
+```
 
-- /api/photos/
-- /api/photos/<int:photo_id>/
-- /api/photos/<int:photo_id>/reviews/
-- /api/photos/<int:photo_id>/reviews/<int:review_id>/
+For a quicker start, the account activation feature of flash-accounts has been disabled. However, to change password, users must provide a valid and existing email.
 
-- /api/tags/
-- /api/tags/<str:tag_name>/
+### Authentication
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+        "username": "user1",
+        "password": "user1password123"
+    }' \
+    http://localhost:8000/api/auth/token/
+```
+
+The above request returns both the `access` token and the `refresh` token. To authenticate, an `Authorization` header must be added to request headers:
+
+```bash
+curl -X POST \
+...
+    -H "Authorization: Bearer {access_token_value}" \ 
+...
+```
+
+### Adding a photo
+
+```bash
+curl -X POST \
+    -H "Content-Type: multipart/form-data" \
+    -H "Authorization: Bearer {access_token_value}" \
+    -F "image=@./my_image.png" \
+    -F "title=my photo" \
+    -F "tags[]=nature" \
+    -F "tags[]=animals" \
+    http://localhost/api/photos/
+```
+
+### Updating a photo
+
+```bash
+curl -X PATCH \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer {access_token_value}" \
+    -d '{"title": "new title"} \
+    http://localhost:8000/api/photos/<int:photo_id>/
+```
+
+### Deleting a photo
+
+```bash
+curl -X DELETE \
+    -H "Authorization: Bearer {access_token_value}" \
+    http://localhost:8000/api/photos/<int:photo_id>/
+```
+
+### Reviewing a photo
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer {access_token_value}" \
+    -d '{
+        "rating": 4,
+        "body": "good photo"
+    }' \
+    http://localhost/api/photos/<int:photo_id>/reviews/
+```
+
+It is important to mention that a user cannot review his own photos.
+
+### Updating a review
+
+```bash
+curl -X PATCH \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer {access_token_value}" \
+    -d '{"rating": 5} \
+    http://localhost:8000/api/photos/<int:photo_id>/reviews/<int:review_id>/
+```
+
+### Deleting a review
+
+```bash
+curl -x DELETE \
+    -H "Authorization: Bearer {access_token_value}" \
+    http://localhost:8000/api/photos/<int:photo_id>/reviews/<int:review_id>/
+```
+
+### Photo list and detail endpoints
+
+List of all photos:
+```bash
+curl http://localhost:8000/api/photos/
+```
+
+The number of results can be limited using the `limit` query parameter, and the results can be filtered using the `search` query parameters. The `ordering` query parameter can be used to order the results:
+
+```bash
+curl http://localhost:8000/api/photos/?limit=3
+curl http://localhost:8000/api/photos/?search=nature
+curl http://localhost:8000/api/photos/?ordering=created_at
+```
+
+A request to the photo detail endpoint is made by providing a photo id:
+
+```bash
+curl http://localhost:8000/api/photos/<int:photo_id>/
+```
+
+### Review list and detail endpoints
+
+List of reviews for a given photo:
+```bash
+curl http://localhost:8000/api/photos/<int:photo_id>/reviews/
+```
+
+A request to the review detail endpoint is made by providing a review id:
+
+```bash
+curl http://localhost:8000/api/photos/<int:photo_id>/reviews/<int:review_id>/
+```
+
+### Tag list and detail endpoints
+
+```bash
+curl http://localhost:8000/api/tags/
+```
+
+The number of results can be limited using the `limit` query parameter, and the results can be filtered using the `search` query parameters. The `ordering` query parameter can be used to order the results:
+
+```bash
+curl http://localhost:8000/api/tags/?limit=3
+curl http://localhost:8000/api/tags/?search=nature
+curl http://localhost:8000/api/tags/?ordering=-number_of_photos
+```
+
+A request to the tag detail endpoint is made by providing a tag name:
+
+```bash
+curl http://localhost:8000/api/tag/nature/
 ```
 
 ## Challenges & Solutions
