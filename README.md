@@ -33,7 +33,7 @@ curl -X POST \
     http://localhost:8000/api/auth/sign-up/
 ```
 
-For a quicker start, the account activation feature of flash-accounts has been disabled. However, to change password, users must provide a valid and existing email.
+For a quicker start, the account activation feature of [flash-accounts](https://github.com/mateusz-meksula/flash-accounts) has been disabled. However, to change password, users must provide a valid and existing email.
 
 ### Authentication
 
@@ -64,8 +64,8 @@ curl -X POST \
     -H "Authorization: Bearer {access_token_value}" \
     -F "image=@./my_image.png" \
     -F "title=my photo" \
-    -F "tags[]=nature" \
-    -F "tags[]=animals" \
+    -F "tags[1]=nature" \
+    -F "tags[2]=animals" \
     http://localhost/api/photos/
 ```
 
