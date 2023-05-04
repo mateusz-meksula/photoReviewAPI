@@ -212,6 +212,11 @@ class PhotoViewSet(ModelViewSet):
 
 ## Frontend JavaScript client
 
+For presentational purposes, this project includes a minimalistic frontend Django app that enables users to interact with the web API using a JavaScript API client.  
+
+![photoreviewAPI2](https://user-images.githubusercontent.com/108681279/236194936-dc3c704e-2bdd-4810-a03d-85909ab47d7d.gif)
+
+
 ## Running project locally
 
 The project in this repository is fully functional, but it has not been prepared for deployment. However, the project is containerized, allowing for easy setup on any machine with Docker installed.
