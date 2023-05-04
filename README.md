@@ -216,6 +216,12 @@ For presentational purposes, this project includes a minimalistic frontend Djang
 
 ![photoreviewAPI2](https://user-images.githubusercontent.com/108681279/236194936-dc3c704e-2bdd-4810-a03d-85909ab47d7d.gif)
 
+The page presented above is located at the project's root URL.  
+The API client also enables sending data to the server:
+
+
+In the above example, a keyboard shortcut `Ctrl` + `p` was used to pretty format entered JSON.
+
 
 ## Running project locally
 
