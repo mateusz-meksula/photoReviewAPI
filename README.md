@@ -214,7 +214,14 @@ class PhotoViewSet(ModelViewSet):
 
 For presentational purposes, this project includes a minimalistic frontend Django app that enables users to interact with the web API using a JavaScript API client.  
 
-![photoreviewAPI2](https://user-images.githubusercontent.com/108681279/236194936-dc3c704e-2bdd-4810-a03d-85909ab47d7d.gif)
+![pra](https://user-images.githubusercontent.com/108681279/236201934-d166161d-72c9-4c26-873c-a85b64b94b10.gif)
+
+The page presented above is located at the project's root URL.  
+The API client also enables sending data to the server:
+
+![pratoken](https://user-images.githubusercontent.com/108681279/236200685-02cca9cc-7d5f-4c88-ac10-34169771639b.gif)
+
+In the above example, a keyboard shortcut `Ctrl` + `p` was used to pretty format entered JSON.
 
 
 ## Running project locally
