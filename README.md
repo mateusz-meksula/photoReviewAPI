@@ -63,7 +63,7 @@ curl -X POST \
     -H "Content-Type: multipart/form-data" \
     -H "Authorization: Bearer {access_token_value}" \
     -F "image=@./my_image.png" \
-    -F "title=my photo" \
+    -F "title=little turtles" \
     -F "tags[1]=nature" \
     -F "tags[2]=animals" \
     http://localhost/api/photos/
@@ -127,12 +127,18 @@ List of all photos:
 curl http://localhost:8000/api/photos/
 ```
 
-The number of results can be limited using the `limit` query parameter, and the results can be filtered using the `search` query parameters. The `ordering` query parameter can be used to order the results:
+The number of results can be limited using the `limit` query parameter, and the results can be filtered by field names. The `ordering` query parameter can be used to order the results:
 
 ```bash
 curl http://localhost:8000/api/photos/?limit=3
-curl http://localhost:8000/api/photos/?search=nature
+curl http://localhost:8000/api/photos/?title=little%20turtles
 curl http://localhost:8000/api/photos/?ordering=created_at
+```
+
+The results can be also filtered using `search` query parameter: 
+
+```bash
+curl http://localhost:8000/api/photos/?search=nature
 ```
 
 A request to the photo detail endpoint is made by providing a photo id:
@@ -160,12 +166,18 @@ curl http://localhost:8000/api/photos/<int:photo_id>/reviews/<int:review_id>/
 curl http://localhost:8000/api/tags/
 ```
 
-The number of results can be limited using the `limit` query parameter, and the results can be filtered using the `search` query parameters. The `ordering` query parameter can be used to order the results:
+The number of results can be limited using the `limit` query parameter, and the results can be filtered by field names. The `ordering` query parameter can be used to order the results:
 
 ```bash
 curl http://localhost:8000/api/tags/?limit=3
-curl http://localhost:8000/api/tags/?search=nature
+curl http://localhost:8000/api/tags/?id=2
 curl http://localhost:8000/api/tags/?ordering=-number_of_photos
+```
+
+The results can be also filtered using `search` query parameter: 
+
+```bash
+curl http://localhost:8000/api/tags/?search=nature
 ```
 
 A request to the tag detail endpoint is made by providing a tag name:
