@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     # my
     "rest_framework",
     "flash_accounts",
+    "django_filters",
     "api",
     "frontend",
 ]
