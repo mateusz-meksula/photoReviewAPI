@@ -195,6 +195,9 @@ The challenge was to implement tagging system for photos, so that users could as
 In order to achieve that, a `Tag` model was created...
 
 ```python
+from django.db import models
+from django.core.exceptions import ValidationError
+
 class Tag(models.Model):
     name = models.CharField(
         max_length=20, unique=True, db_index=True, validators=[tag_name_validator]
@@ -211,7 +214,9 @@ def tag_name_validator(name: str):
 ...and `ManyToMany` relationship field was added to the `Photo` model:
 
 ```python
-class Photo(BaseModel):
+from django.db import models
+
+class Photo(models.Model):
     # ...
     tags = models.ManyToManyField(Tag, related_name="photos")
     # ...
@@ -221,6 +226,8 @@ That allows `Photo` instances to be associated with multiple tags and vice versa
 The design choice was made to enable users to add tags and photos in a single POST request and specify tags by their `name` field instead of their `id` field. To meet these requirements, a `PhotoCreateSerializer` was written as follows:
 
 ```python
+from rest_framework import serializers
+
 class PhotoCreateSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=True)
     tags = serializers.ListField(write_only=True, required=False)
@@ -244,6 +251,8 @@ With that, users can provide tags as a list of strings and when `create` method 
 A similar approach was implemented for the `PhotoPatchSerializer` using the `update` method:
 
 ```python
+from rest_framework import serializers
+
 class PhotoPatchSerializer(serializers.ModelSerializer):
     # ...
 
@@ -267,7 +276,12 @@ The challenge was to implement a review system for photos, so that users could r
 The first step was to create a `Review` model with `ForeignKey` field referencing the `Photo` model:
 
 ```python
-class Review(BaseModel):
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+User = get_user_model()
+
+class Review(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="reviews", editable=False
     )
@@ -292,6 +306,9 @@ This approach allows the API to retrieve only the reviews added to a specific ph
 Nested reviews URLs were achieved by creating separate router for reviews and including its URLs on top of the photo retrieve endpoint:
 
 ```python
+from djago.urls import path, include
+from rest_framework.routers import SimpleRouter
+
 # ...
 router = SimpleRouter()
 router.register(r"photos", views.PhotoViewSet, basename="photo")
@@ -305,6 +322,8 @@ urlpatterns += [path("photos/<int:photo_id>/", include(reviews_router.urls))]
 To ensure that only reviews related to the `photo_id` are returned, the `get_queryset` method of the `ReviewViewSet` was overwritten:
 
 ```python
+from rest_framework.viewsets import ModelViewSet
+
 class ReviewViewSet(ModelViewSet):
     # ...
 
@@ -317,6 +336,9 @@ The photo retrieve endpoint `/api/photos/<int:photo_id>/` returns photo data tog
 The solution to that problem was to create a custom hyperlinked related field...
 
 ```python
+from rest_framework import serializers
+from rest_framework.reverse import reverse
+
 class ReviewRelatedHyperLink(serializers.HyperlinkedRelatedField):
     view_name = "review-detail"
 
@@ -336,6 +358,8 @@ class ReviewRelatedHyperLink(serializers.HyperlinkedRelatedField):
 ...and declare it in the `PhotoDetailSerializer`:
 
 ```python
+from rest_framework import serializers
+
 class PhotoDetailSerializer(serializers.ModelSerializer):
     # ...
     reviews = ReviewRelatedHyperLink(many=True, read_only=True)
@@ -353,6 +377,9 @@ class PhotoDetailSerializer(serializers.ModelSerializer):
 The response data for photos includes an `average_rating` field, which was obtained by annotating the query set:
 
 ```python
+from rest_framework.viewsets import ModelViewSet
+from .models import Photo
+
 class PhotoViewSet(ModelViewSet):
     # ...
     queryset = Photo.objects.annotate(average_rating=Avg("reviews__rating"))
